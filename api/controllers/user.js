@@ -1,5 +1,5 @@
-const User = require("../models/userModels");
-const bcrypt = require("bcrypt");
+const User = require('../models/userModels');
+const bcrypt = require('bcrypt');
 
 const createUser = (req, res) => {
   const { username, password } = req.body;
@@ -8,8 +8,8 @@ const createUser = (req, res) => {
   const user = new User({ username, password });
   user
     .save()
-    .then(savedUser => {
-      res.json(savedUser);
+    .then(newUser => {
+      res.status(200).json(newUser);
     })
     .catch(err => {
       res.status(500).json(err);

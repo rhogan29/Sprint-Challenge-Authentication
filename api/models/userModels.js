@@ -19,26 +19,18 @@ const UserSchema = Schema({
   },
 });
 
-UserSchema.pre('save', function(next) {
-  bcrypt.hash(this.password, SALT_ROUNDS, (err, hash) => {
-    if (err) {
-      return next(err);
-    }
+UserSchema.pre("save", function(next) {
+  bcrypt.hash(this.password, 11, (err, hash) => {
+    if (err) return next(err);
     this.password = hash;
     return next();
   });
 });
 
 UserSchema.methods.checkPassword = function(plainTextPW, callBack) {
-  // https://github.com/kelektiv/node.bcrypt.js#usage
-  // Fill this method in with the Proper password comparing, bcrypt.compare()
-  // Your controller will be responsible for sending the information here for password comparison
-  // Once you have the user, you'll need to pass the encrypted pw and the plaintext pw to the compare function
-  bcrypt.compare(plainTextPW, this.password, function(err, isValid) {
-    if (err) {
-      return callBack(err);
-    }
-    callBack(null, isValid);
+  return bcrypt.compare(plainTextPW, this.password, function(err, match) {
+    if (match) return callBack(null, match);
+    return callBack(err);
   });
 };
 
