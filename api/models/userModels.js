@@ -20,13 +20,13 @@ const UserSchema = Schema({
 });
 
 UserSchema.pre('save', function(next) {
-  bcrypt
-  .hash(this.password, SALT_ROUNDS)
-  .then(hash => {
+  bcrypt.hash(this.password, SALT_ROUNDS, (err, hash) => {
+    if (err) {
+      return next(err);
+    }
     this.password = hash;
-    next();
-  })
-  .catch(err => next(err));
+    return next();
+  });
 });
 
 UserSchema.methods.checkPassword = function(plainTextPW, callBack) {
@@ -34,6 +34,12 @@ UserSchema.methods.checkPassword = function(plainTextPW, callBack) {
   // Fill this method in with the Proper password comparing, bcrypt.compare()
   // Your controller will be responsible for sending the information here for password comparison
   // Once you have the user, you'll need to pass the encrypted pw and the plaintext pw to the compare function
+  bcrypt.compare(plainTextPW, this.password, function(err, isValid) {
+    if (err) {
+      return callBack(err);
+    }
+    callBack(null, isValid);
+  });
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);
