@@ -20,7 +20,7 @@ const UserSchema = Schema({
 });
 
 UserSchema.pre("save", function(next) {
-  bcrypt.hash(this.password, 11, (err, hash) => {
+  bcrypt.hash(this.password, SALT_ROUNDS, (err, hash) => {
     if (err) return next(err);
     this.password = hash;
     return next();
@@ -28,10 +28,8 @@ UserSchema.pre("save", function(next) {
 });
 
 UserSchema.methods.checkPassword = function(plainTextPW, callBack) {
-  return bcrypt.compare(plainTextPW, this.password, function(err, match) {
-    if (match) return callBack(null, match);
-    return callBack(err);
-  });
+  console.log(plainTextPW, this.password);
+  return bcrypt.compare(plainTextPW, this.password, callBack);
 };
 
 module.exports = mongoose.model("User", UserSchema);
